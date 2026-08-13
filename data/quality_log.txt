@@ -1,0 +1,7 @@
+rows=5282 range=2005-01-03..2025-12-30
+max |daily return| = 0.1452 on 2008-10-13
+WARNING: stooq cross-check unavailable (Unable to read URL: https://stooq.com/q/d/l/?s=SPY.US&i=d&d1=20050102&d2=20251231
+Response Text:
+b'<meta charset=utf-8><title>Stooq</title><center style=font-family:arial;margin-top:50px><p><a href=/><img src=//static.stooq.com/stooq.svg height=68></a><p style=font-size:x-large>The page you requested does not exist<br>or has been moved<p><small><a href=/>Main Page</a>'); falling back to FRED SP500 index (returns-based, partial range)
+fallback cross-check (FRED SP500 returns) n=2357 range=2016-08-16..2025-12-30 max abs return diff=1.0417%
+rf mean annualised = 1.709%

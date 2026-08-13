@@ -4,6 +4,6 @@ pandas==2.2.2
 matplotlib==3.8.4
 pyyaml==6.0.1
 pytest==8.2.0
-yfinance==0.2.40
+yfinance==1.6.0  # bumped from 0.2.40 (2026-08-14): old version could not auth against Yahoo's current API
 pandas-datareader==0.10.0
 arch==7.0.0

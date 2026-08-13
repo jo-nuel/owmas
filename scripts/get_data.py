@@ -53,7 +53,22 @@ def main() -> None:
         log.append(f"cross-check n={len(joined)} max reldiff={reldiff.max():.4%}")
         assert reldiff.max() < 0.01, "close prices disagree >1% with second source"
     except Exception as e:  # cross-check is best-effort but its absence must be logged
-        log.append(f"WARNING: second-source cross-check unavailable: {e}")
+        log.append(f"WARNING: stooq cross-check unavailable ({e}); "
+                   "falling back to FRED SP500 index (returns-based, partial range)")
+        # SP500 is an index level (not an ETF price), so compare daily returns
+        # rather than price levels; FRED only retains ~10 years for this series.
+        try:
+            sp500 = pdr.DataReader("SP500", "fred", c["start"], c["end"]).iloc[:, 0].dropna()
+            joined = pd.concat([df["close"].pct_change(), sp500.pct_change()],
+                               axis=1, join="inner").dropna()
+            joined.columns = ["spy_close_ret", "sp500_index_ret"]
+            absdiff = (joined["spy_close_ret"] - joined["sp500_index_ret"]).abs()
+            log.append(f"fallback cross-check (FRED SP500 returns) n={len(joined)} "
+                       f"range={joined.index[0].date()}..{joined.index[-1].date()} "
+                       f"max abs return diff={absdiff.max():.4%}")
+            assert absdiff.max() < 0.015, "daily returns disagree >1.5pp with FRED SP500"
+        except Exception as e2:
+            log.append(f"WARNING: second-source cross-check unavailable: {e2}")
 
     # --- Risk-free rate (FRED DTB3, percent -> daily decimal) ---
     rf = pdr.DataReader(c["rf_series"], "fred", c["start"], c["end"])
