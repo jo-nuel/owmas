@@ -1,0 +1,9 @@
+# Pin exact versions after first successful install: pip freeze > requirements.txt
+numpy==1.26.4
+pandas==2.2.2
+matplotlib==3.8.4
+pyyaml==6.0.1
+pytest==8.2.0
+yfinance==0.2.40
+pandas-datareader==0.10.0
+arch==7.0.0

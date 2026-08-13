@@ -1,0 +1,52 @@
+# Pre-registered parameters — AT2 Methodology §3.3–3.9.
+# Registered 2026-07-20, before any performance evaluation.
+# Changes after evaluation begins must be documented as protocol deviations.
+
+data:
+  ticker: SPY
+  start: "2005-01-02"
+  end: "2025-12-31"
+  price_field: adj_close
+  rf_series: DTB3            # FRED 3-month T-bill; cash yield + Sharpe risk-free rate
+  max_abs_daily_return: 0.20 # halting assertion threshold (§3.11)
+
+signal:
+  short_window: 20
+  long_window: 50
+  rule: crossover            # single rule for all methods (§3.5)
+  timing: t_plus_1           # signal at t -> position at t+1
+
+owmas:
+  beta_primary: 0.5
+  gamma_profiles:            # Q(r) = r^gamma applied to descending-ordered values (§3.4)
+    optimistic: 0.5
+    neutral: 1.0
+    conservative: 2.0
+  primary_profile: neutral
+
+backtest:
+  long_only: true
+  transaction_cost: 0.001    # per position change, all methods
+  cash_earns_rf: true        # §3.7
+  periods_per_year: 252
+
+divergence_audit:            # §3.7 — run BEFORE any performance evaluation
+  min_divergent_days_frac: 0.05
+  escalation_beta: 0.75      # pre-registered escalation if audit fails
+
+stats:                       # §3.9
+  bootstrap_reps: 10000
+  seed: 14487692
+  confidence: 0.95
+  rolling_sharpe_window: 252 # H3
+
+robustness:                  # §3.10
+  subperiods:
+    gfc:        ["2007-10-01", "2009-06-30"]
+    post_gfc:   ["2010-01-01", "2019-12-31"]
+    covid:      ["2020-01-01", "2020-12-31"]
+    tightening: ["2022-01-01", "2022-12-31"]
+  holdout: ["2016-01-01", "2025-12-31"]
+  sensitivity:
+    beta: [0.25, 0.75]
+    windows_alt: [10, 30]

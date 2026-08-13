@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+.DS_Store
+
+# NOTE: data/ is deliberately NOT ignored.
+# The frozen SPY dataset and its quality log are research artifacts —
+# the reproducibility claim in the methodology depends on versioning the
+# exact snapshot used. The files are small (a few hundred KB).
+
+# Generated outputs are reproducible from the frozen data by running the
+# pipeline, so they are not versioned:
+results/
+*.pdf
