@@ -1,0 +1,11 @@
+# data/spy.csv and data/rf.csv are frozen research artifacts (see CLAUDE.md
+# hard rule 4: "Do not re-download or modify the frozen dataset"). With
+# core.autocrlf=true (common on Windows checkouts), git normalises text
+# files' line endings on checkout/commit, which can make an untouched file
+# show as "modified" purely from CRLF/LF conversion. For a pre-registered
+# dataset that must be reproducible byte-for-byte, that's not just noise —
+# a real accidental edit could hide inside what looks like a routine
+# line-ending diff. Marking these files "-text" tells git to leave them
+# alone entirely: no line-ending conversion, ever, regardless of platform
+# or autocrlf setting.
+data/*.csv -text

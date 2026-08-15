@@ -5,3 +5,88 @@ Response Text:
 b'<meta charset=utf-8><title>Stooq</title><center style=font-family:arial;margin-top:50px><p><a href=/><img src=//static.stooq.com/stooq.svg height=68></a><p style=font-size:x-large>The page you requested does not exist<br>or has been moved<p><small><a href=/>Main Page</a>'); falling back to FRED SP500 index (returns-based, partial range)
 fallback cross-check (FRED SP500 returns) n=2357 range=2016-08-16..2025-12-30 max abs return diff=1.0417%
 rf mean annualised = 1.709%
+
+[2026-08-15T00:17:22.041168+00:00] verify_data.py � spy.csv vs spy_stooq.csv (close, �3.3)
+overlap n=5244 coverage=99.28% of 5282 frozen rows
+overlap range=2005-02-25..2025-12-30
+abs reldiff: mean=17.3524% p99.9=29.6828% max=29.7007%
+largest differences:
+  2007-07-09  spy_close=153.1000  stooq_close=118.0410  reldiff=29.7007%
+  2005-12-21  spy_close=126.0300  stooq_close=97.1739  reldiff=29.6953%
+  2008-07-21  spy_close=126.0500  stooq_close=97.1938  reldiff=29.6893%
+  2006-07-12  spy_close=126.0500  stooq_close=97.1938  reldiff=29.6893%
+  2005-12-08  spy_close=126.0000  stooq_close=97.1557  reldiff=29.6887%
+  2005-12-07  spy_close=126.0800  stooq_close=97.2218  reldiff=29.6829%
+  2010-12-29  spy_close=125.9200  stooq_close=97.0986  reldiff=29.6826%
+  2006-01-20  spy_close=125.9700  stooq_close=97.1375  reldiff=29.6822%
+  2005-11-29  spy_close=126.0900  stooq_close=97.2312  reldiff=29.6806%
+  2008-09-12  spy_close=126.0900  stooq_close=97.2312  reldiff=29.6806%
+
+[2026-08-15T00:22:33.594383+00:00] verify_data.py � spy.csv vs spy_stooq.csv (close, �3.3)
+overlap n=5244 coverage=99.28% of 5282 frozen rows
+overlap range=2005-02-25..2025-12-30
+abs reldiff: mean=17.3524% p99.9=29.6828% max=29.7007%
+largest differences:
+  2007-07-09  spy_close=153.1000  stooq_close=118.0410  reldiff=29.7007%
+  2005-12-21  spy_close=126.0300  stooq_close=97.1739  reldiff=29.6953%
+  2008-07-21  spy_close=126.0500  stooq_close=97.1938  reldiff=29.6893%
+  2006-07-12  spy_close=126.0500  stooq_close=97.1938  reldiff=29.6893%
+  2005-12-08  spy_close=126.0000  stooq_close=97.1557  reldiff=29.6887%
+  2005-12-07  spy_close=126.0800  stooq_close=97.2218  reldiff=29.6829%
+  2010-12-29  spy_close=125.9200  stooq_close=97.0986  reldiff=29.6826%
+  2006-01-20  spy_close=125.9700  stooq_close=97.1375  reldiff=29.6822%
+  2005-11-29  spy_close=126.0900  stooq_close=97.2312  reldiff=29.6806%
+  2008-09-12  spy_close=126.0900  stooq_close=97.2312  reldiff=29.6806%
+
+[2026-08-15T00:27:17.225874+00:00] verify_data.py � spy.csv vs spy_stooq.csv (close, �3.3)
+overlap n=5244 coverage=99.28% of 5282 frozen rows
+overlap range=2005-02-25..2025-12-30
+abs reldiff: mean=0.0066% p99.9=0.0963% max=1.1066%
+largest differences:
+  2009-07-16  spy_close=93.1100  stooq_close=94.1519  reldiff=1.1066%
+  2015-03-13  spy_close=205.8300  stooq_close=208.0755  reldiff=1.0792%
+  2015-03-12  spy_close=207.1000  stooq_close=205.2089  reldiff=0.9215%
+  2012-01-20  spy_close=131.9500  stooq_close=131.5528  reldiff=0.3019%
+  2010-10-18  spy_close=118.2800  stooq_close=118.5296  reldiff=0.2106%
+  2015-08-21  spy_close=197.8300  stooq_close=197.6257  reldiff=0.1034%
+  2006-08-16  spy_close=129.7000  stooq_close=129.7961  reldiff=0.0741%
+  2007-07-09  spy_close=153.1000  stooq_close=152.9939  reldiff=0.0694%
+  2005-12-21  spy_close=126.0300  stooq_close=125.9479  reldiff=0.0652%
+  2008-07-21  spy_close=126.0500  stooq_close=125.9736  reldiff=0.0606%
+
+[2026-08-15] outlier investigation note (manual, not from verify_data.py)
+Investigated the 3 dates exceeding 0.5% close-vs-close diff in the run above
+(2009-07-16, 2015-03-12, 2015-03-13).
+
+Open/High/Low/Volume agree closely between spy.csv and spy_stooq.csv on all
+three dates (~0.01-0.05% typical diff, comparable to routine noise on
+non-outlier days). This rules out a date-alignment artifact: a
+shifted/mislabeled row would move the whole OHLCV bar, not Close alone.
+
+Daily range (high-low) for context, since a narrow range would make "close
+sits near an extreme" weak evidence by itself:
+  2009-07-16  spy range=1.69 (1.82% of close)   stooq range=1.69 (1.79% of close)
+              spy close at 17.2% of its own range; stooq close at 78.8%
+  2015-03-12  spy range=1.98 (0.96% of close)   stooq range=2.31 (1.13% of close)
+              spy close at 96.0% of its own range; stooq close at 14.9%
+  2015-03-13  spy range=3.35 (1.63% of close)   stooq range=3.53 (1.70% of close)
+              spy close at 37.3% of its own range; stooq close at 99.7%
+None of these three ranges is unusually narrow for SPY (typical daily range
+is roughly 1% of price), so the divergence is not simply an artifact of a
+tight trading band. What the range positions show is that the two vendors
+place Close asymmetrically within a similarly-sized range on the same day --
+sometimes near opposite ends (2015-03-12), sometimes only one vendor sits at
+an extreme while the other is unremarkable (2015-03-13, 2009-07-16).
+
+This pattern is CONSISTENT WITH a vendor-level closing-print discrepancy
+(e.g. primary auction close vs. a composite/consolidated close) -- that is a
+hypothesis inferred from the price pattern, not confirmed against either
+vendor's methodology documentation or a third source, and should be reported
+as unresolved rather than explained. Caveat: 2009-07-16's 1.1% discrepancy is
+large for that mechanism specifically -- routine primary-vs-composite close
+differences are typically far smaller than a full percent of price, so this
+magnitude is not confidently attributable to that cause alone.
+
+Net: 3 of 5244 overlap days (0.057%) have an unresolved close-only
+discrepancy >0.5%; OHLV on those same days and Close on all other days agree
+to within a few basis points across the 20+ year overlap.
