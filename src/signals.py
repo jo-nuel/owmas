@@ -18,7 +18,7 @@ import pandas as pd
 
 def sma(prices: pd.Series, m: int) -> pd.Series:
     """Simple moving average."""
-    raise NotImplementedError
+    return prices.rolling(m).mean()
 
 
 def wma(prices: pd.Series, m: int) -> pd.Series:
@@ -27,7 +27,12 @@ def wma(prices: pd.Series, m: int) -> pd.Series:
     w_i = (m - i) / (1 + 2 + ... + m) for lag i = 0 (today) .. m-1,
     so the most recent observation has the largest weight.
     """
-    raise NotImplementedError
+    denom = m * (m + 1) / 2
+    # weights[k] applies to the k-th element of the rolling window as
+    # pandas presents it: chronological, oldest first. weights[-1]
+    # (largest) lands on today, i.e. lag i = 0.
+    weights = np.arange(1, m + 1) / denom
+    return prices.rolling(m).apply(lambda x: np.dot(x, weights), raw=True)
 
 
 def ema(prices: pd.Series, m: int) -> pd.Series:
@@ -37,7 +42,13 @@ def ema(prices: pd.Series, m: int) -> pd.Series:
     initialised with the SMA of the first m observations
     (a standard, documented choice — state it in the thesis).
     """
-    raise NotImplementedError
+    lam = 2 / (m + 1)
+    result = pd.Series(np.nan, index=prices.index)
+    start = m - 1
+    result.iloc[start] = prices.iloc[:m].mean()
+    for i in range(start + 1, len(prices)):
+        result.iloc[i] = lam * prices.iloc[i] + (1 - lam) * result.iloc[i - 1]
+    return result
 
 
 def owa_weights(gamma: float, m: int) -> np.ndarray:
@@ -46,24 +57,31 @@ def owa_weights(gamma: float, m: int) -> np.ndarray:
     v_j = Q(j/m) - Q((j-1)/m) for j = 1..m, applied to
     descending-ordered arguments. Returns array of length m, sums to 1.
     """
-    raise NotImplementedError
+    j = np.arange(1, m + 1)
+    q = lambda r: r ** gamma
+    return q(j / m) - q((j - 1) / m)
 
 
 def orness(v: np.ndarray) -> float:
     """alpha(v) = (1/(m-1)) * sum_j (m - j) * v_j  with j = 1..m."""
-    raise NotImplementedError
+    m = len(v)
+    j = np.arange(1, m + 1)
+    return float(np.sum((m - j) * v) / (m - 1))
 
 
 def owmas(prices: pd.Series, m: int, beta: float, gamma: float) -> pd.Series:
     """OWAWMA-based signal — §3.4.
 
-    For each window: sort descending to get b_1 >= ... >= b_m; let
-    sigma(j) be the original lag of the j-th largest observation, and
-    w the WMA positional weights. Then
-
-        OWMAS_t = sum_j (beta * v_j + (1 - beta) * w_sigma(j)) * b_j
-
-    beta = 0 must reproduce wma() exactly; beta = 1, gamma = 1 must
-    reproduce sma() exactly.
+    Uses the separable form, Merigó & Yager (2019) Eq. (4):
+        OWMAS = beta * OWMA + (1 - beta) * WMA
+    where OWMA applies owa_weights(gamma, m) to the window sorted
+    descending. beta = 0 reproduces wma() exactly; beta = 1, gamma = 1
+    reproduces sma() exactly (equal OWA weights == arithmetic mean).
     """
-    raise NotImplementedError
+    v = owa_weights(gamma, m)  # v[0] weights the largest value in the window
+
+    def _owma_window(x):
+        return np.dot(np.sort(x)[::-1], v)
+
+    owma = prices.rolling(m).apply(_owma_window, raw=True)
+    return beta * owma + (1 - beta) * wma(prices, m)
