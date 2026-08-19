@@ -1,0 +1,3 @@
+profile,beta,nearest_benchmark,frac_days_differ,n_differing_trades
+optimistic,0.75,sma,0.03426732298371829,180
+conservative,0.75,sma,0.029155622870124954,152

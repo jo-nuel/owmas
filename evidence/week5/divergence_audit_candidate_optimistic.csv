@@ -1,0 +1,7 @@
+strategy_a,strategy_b,frac_days_differ,n_trades_a,n_trades_b,n_differing_trades
+sma,wma,0.12211283604695192,105,133,226
+sma,ema,0.09920484664899659,105,73,170
+sma,owmas_beta_0.75_optimistic,0.03426732298371829,105,109,180
+wma,ema,0.1255206361226808,133,73,198
+wma,owmas_beta_0.75_optimistic,0.09920484664899659,133,109,232
+ema,owmas_beta_0.75_optimistic,0.09522907989397955,73,109,174
