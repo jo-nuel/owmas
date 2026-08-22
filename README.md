@@ -35,6 +35,7 @@ Validate completed work with:
     python scripts/validate_stats.py
     python scripts/validate_experiment_outputs.py
     python scripts/validate_week9_notebook.py
+    python scripts/validate_week11_draft.py
     pytest -q
 
 ## Week 9 preliminary results
@@ -43,6 +44,13 @@ Open `notebooks/week9_preliminary_results.ipynb` in Jupyter, VS Code, or another
 notebook viewer to present the checkpoint. It reads the fixed registered outputs
 and shows the main performance table, Sharpe-ratio significance tests, equity
 curves, and drawdowns.
+
+## Week 11 chapter draft
+
+The draft Results and Discussion chapters are in
+`evidence/week11/results_and_discussion_draft.md`. They cover all four
+hypotheses, the registered market subperiods, rolling Sharpe, sensitivity, and
+the 2016 to 2025 holdout.
 
 ## Reproducibility
 
