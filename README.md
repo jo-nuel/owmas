@@ -12,12 +12,13 @@ and buy-and-hold on daily SPY data 2005–2025, per the pre-registered methodolo
   code must read parameters from here, never hard-code them.
 - `scripts/get_data.py` — downloads SPY + 3-month T-bill data, runs halting data
   assertions, writes the frozen dataset to `data/`. Run once; never re-download silently.
-- `src/signals.py` — SMA, WMA, EMA, OWA weights, orness, OWMAS. **Stubs — you implement.**
-- `src/backtest.py` — crossover rule, t+1 positions, costs, cash yield, equity. **Stubs.**
-- `src/metrics.py` — CAGR, Sharpe, Sortino, max drawdown, volatility, exposure. **Stubs.**
-- `src/stats.py` — Ledoit–Wolf Sharpe test + stationary bootstrap. **Stubs with references.**
-- `tests/` — the validation harness (§3.11). Complete. Your implementations must pass
-  these unmodified. `pytest -q` runs everything.
+- `src/signals.py` — SMA, WMA, EMA, OWA weights, orness, and OWMAS.
+- `src/backtest.py` — crossover rule, t+1 positions, costs, cash yield, and equity.
+- `src/metrics.py` — CAGR, Sharpe, Sortino, max drawdown, volatility, and exposure.
+- `src/stats.py` — Ledoit-Wolf Sharpe test and stationary-bootstrap intervals.
+- `tests/` — the validation harness (§3.11). `pytest -q` runs everything.
+- `scripts/validate_stats.py` — deterministic validation against the published
+  Ledoit-Wolf mutual-fund example and the registered bootstrap seed.
 
 ## Workflow (build order)
 
@@ -26,7 +27,14 @@ and buy-and-hold on daily SPY data 2005–2025, per the pre-registered methodolo
 3. Implement `src/backtest.py` + `src/metrics.py` until `pytest tests/test_backtest.py` passes.
 4. Run the signal-divergence audit (§3.7) — go/no-go checkpoint with supervisor.
 5. Implement `src/stats.py`, validate Ledoit–Wolf against a published example.
-6. Full experiment.
+6. `python scripts/run_experiment.py` — run the full registered experiment and
+   write tables, figures, metadata, and a generated summary to `results/`.
+
+Validate completed work with:
+
+    python scripts/validate_stats.py
+    python scripts/validate_experiment_outputs.py
+    pytest -q
 
 ## Reproducibility
 

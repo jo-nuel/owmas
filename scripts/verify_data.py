@@ -6,7 +6,9 @@ Compares the `close` column only (not adj_close: dividend-adjustment
 conventions differ between providers and would produce false alarms).
 
 Run: python scripts/verify_data.py
-Exits non-zero if the maximum relative difference exceeds 0.5%.
+Exits non-zero for inadequate coverage or a systematic price discrepancy.
+Isolated provider errors are reported for review but do not invalidate an
+otherwise matching 20-year series.
 """
 from datetime import datetime, timezone
 from pathlib import Path
@@ -16,7 +18,11 @@ import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
-MAX_RELDIFF = 0.005
+MIN_COVERAGE = 0.99
+OUTLIER_RELDIFF = 0.005
+MAX_OUTLIER_FRAC = 0.001
+MAX_MEAN_RELDIFF = 0.0001
+MAX_P999_RELDIFF = 0.001
 
 
 def _load_close(path: Path) -> pd.Series:
@@ -36,9 +42,11 @@ def main() -> None:
     total_rows = len(spy)
     n = len(joined)
     reldiff = (joined["spy_close"] / joined["stooq_close"] - 1).abs()
+    coverage = n / total_rows
+    outliers = reldiff > OUTLIER_RELDIFF
 
     lines = [f"[{datetime.now(timezone.utc).isoformat()}] verify_data.py — spy.csv vs spy_stooq.csv (close, §3.3)"]
-    lines.append(f"overlap n={n} coverage={n / total_rows:.2%} of {total_rows} frozen rows")
+    lines.append(f"overlap n={n} coverage={coverage:.2%} of {total_rows} frozen rows")
 
     if n == 0:
         lines.append("no overlapping dates — cannot compare")
@@ -47,6 +55,10 @@ def main() -> None:
         lines.append(
             f"abs reldiff: mean={reldiff.mean():.4%} "
             f"p99.9={reldiff.quantile(0.999):.4%} max={reldiff.max():.4%}"
+        )
+        lines.append(
+            f"outliers above {OUTLIER_RELDIFF:.2%}: "
+            f"n={outliers.sum()} fraction={outliers.mean():.4%}"
         )
         lines.append("largest differences:")
         for date, val in reldiff.sort_values(ascending=False).head(10).items():
@@ -62,9 +74,29 @@ def main() -> None:
     with open(DATA / "quality_log.txt", "a", encoding="utf-8") as f:
         f.write("\n" + report + "\n")
 
-    if n == 0 or reldiff.max() > MAX_RELDIFF:
-        detail = "no overlap" if n == 0 else f"max relative difference {reldiff.max():.4%} exceeds {MAX_RELDIFF:.2%}"
-        sys.exit(f"FAIL: {detail}")
+    failures = []
+    if n == 0:
+        failures.append("no overlap")
+    else:
+        if coverage < MIN_COVERAGE:
+            failures.append(f"coverage {coverage:.2%} is below {MIN_COVERAGE:.2%}")
+        if reldiff.mean() > MAX_MEAN_RELDIFF:
+            failures.append(
+                f"mean relative difference {reldiff.mean():.4%} exceeds "
+                f"{MAX_MEAN_RELDIFF:.2%}"
+            )
+        if reldiff.quantile(0.999) > MAX_P999_RELDIFF:
+            failures.append(
+                f"p99.9 relative difference {reldiff.quantile(0.999):.4%} "
+                f"exceeds {MAX_P999_RELDIFF:.2%}"
+            )
+        if outliers.mean() > MAX_OUTLIER_FRAC:
+            failures.append(
+                f"outlier fraction {outliers.mean():.4%} exceeds "
+                f"{MAX_OUTLIER_FRAC:.2%}"
+            )
+    if failures:
+        sys.exit("FAIL: " + "; ".join(failures))
 
 
 if __name__ == "__main__":

@@ -90,3 +90,53 @@ magnitude is not confidently attributable to that cause alone.
 Net: 3 of 5244 overlap days (0.057%) have an unresolved close-only
 discrepancy >0.5%; OHLV on those same days and Close on all other days agree
 to within a few basis points across the 20+ year overlap.
+
+[2026-08-22T12:49:17.036185+00:00] verify_data.py — spy.csv vs spy_stooq.csv (close, §3.3)
+overlap n=5244 coverage=99.28% of 5282 frozen rows
+overlap range=2005-02-25..2025-12-30
+abs reldiff: mean=0.0066% p99.9=0.0963% max=1.1066%
+largest differences:
+  2009-07-16  spy_close=93.1100  stooq_close=94.1519  reldiff=1.1066%
+  2015-03-13  spy_close=205.8300  stooq_close=208.0755  reldiff=1.0792%
+  2015-03-12  spy_close=207.1000  stooq_close=205.2089  reldiff=0.9215%
+  2012-01-20  spy_close=131.9500  stooq_close=131.5528  reldiff=0.3019%
+  2010-10-18  spy_close=118.2800  stooq_close=118.5296  reldiff=0.2106%
+  2015-08-21  spy_close=197.8300  stooq_close=197.6257  reldiff=0.1034%
+  2006-08-16  spy_close=129.7000  stooq_close=129.7961  reldiff=0.0741%
+  2007-07-09  spy_close=153.1000  stooq_close=152.9939  reldiff=0.0694%
+  2005-12-21  spy_close=126.0300  stooq_close=125.9479  reldiff=0.0652%
+  2008-07-21  spy_close=126.0500  stooq_close=125.9736  reldiff=0.0606%
+
+[2026-08-22T13:01:42.241192+00:00] verify_data.py — spy.csv vs spy_stooq.csv (close, §3.3)
+overlap n=5244 coverage=99.28% of 5282 frozen rows
+overlap range=2005-02-25..2025-12-30
+abs reldiff: mean=0.0066% p99.9=0.0963% max=1.1066%
+outliers above 0.50%: n=3 fraction=0.0572%
+largest differences:
+  2009-07-16  spy_close=93.1100  stooq_close=94.1519  reldiff=1.1066%
+  2015-03-13  spy_close=205.8300  stooq_close=208.0755  reldiff=1.0792%
+  2015-03-12  spy_close=207.1000  stooq_close=205.2089  reldiff=0.9215%
+  2012-01-20  spy_close=131.9500  stooq_close=131.5528  reldiff=0.3019%
+  2010-10-18  spy_close=118.2800  stooq_close=118.5296  reldiff=0.2106%
+  2015-08-21  spy_close=197.8300  stooq_close=197.6257  reldiff=0.1034%
+  2006-08-16  spy_close=129.7000  stooq_close=129.7961  reldiff=0.0741%
+  2007-07-09  spy_close=153.1000  stooq_close=152.9939  reldiff=0.0694%
+  2005-12-21  spy_close=126.0300  stooq_close=125.9479  reldiff=0.0652%
+  2008-07-21  spy_close=126.0500  stooq_close=125.9736  reldiff=0.0606%
+
+[2026-08-22T14:15:35.140280+00:00] verify_data.py — spy.csv vs spy_stooq.csv (close, §3.3)
+overlap n=5244 coverage=99.28% of 5282 frozen rows
+overlap range=2005-02-25..2025-12-30
+abs reldiff: mean=0.0066% p99.9=0.0963% max=1.1066%
+outliers above 0.50%: n=3 fraction=0.0572%
+largest differences:
+  2009-07-16  spy_close=93.1100  stooq_close=94.1519  reldiff=1.1066%
+  2015-03-13  spy_close=205.8300  stooq_close=208.0755  reldiff=1.0792%
+  2015-03-12  spy_close=207.1000  stooq_close=205.2089  reldiff=0.9215%
+  2012-01-20  spy_close=131.9500  stooq_close=131.5528  reldiff=0.3019%
+  2010-10-18  spy_close=118.2800  stooq_close=118.5296  reldiff=0.2106%
+  2015-08-21  spy_close=197.8300  stooq_close=197.6257  reldiff=0.1034%
+  2006-08-16  spy_close=129.7000  stooq_close=129.7961  reldiff=0.0741%
+  2007-07-09  spy_close=153.1000  stooq_close=152.9939  reldiff=0.0694%
+  2005-12-21  spy_close=126.0300  stooq_close=125.9479  reldiff=0.0652%
+  2008-07-21  spy_close=126.0500  stooq_close=125.9736  reldiff=0.0606%

@@ -30,12 +30,11 @@ def test_truncation_does_not_change_history():
 
 
 def test_position_is_shifted_at_least_one_day():
-    # A signal flip on day t must not affect the return earned on day t.
+    # The executed position on t must equal the signal observed on t-1.
     pos = _positions(PRICES)
     raw = (sma(PRICES, 20) > sma(PRICES, 50)).astype(float)
-    changes = raw.diff().abs() > 0
-    same_day = (pos.diff().abs() > 0) & changes
-    assert not same_day.any(), "position changes on the same day as its signal"
+    expected = raw.shift(1, fill_value=0.0)
+    pd.testing.assert_series_equal(pos, expected, check_names=False)
 
 
 # ---------- known-answer test on synthetic data (§3.11 fourth class) ----------

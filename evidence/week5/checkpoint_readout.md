@@ -6,6 +6,12 @@ The registered primary OWMAS configuration does not clear the 5% signal-divergen
 
 No return, Sharpe-ratio, drawdown, or other performance result has been computed for this checkpoint.
 
+## Decision recorded on 22 August 2026
+
+The supervisor approved continuation and left the choice among the three proposed paths to the student. Option 1 was selected: preserve the registered beta=0.50 neutral configuration, report the 4.92% divergence from SMA as a limitation and substantive finding, and continue with the registered performance evaluation without tuning the primary signal.
+
+No registered parameter was changed. The full decision record is in `supervisor_decision.md`.
+
 ## Implementation status
 
 - SMA, WMA, EMA, OWA weights, orness and OWMAS are implemented.
