@@ -34,7 +34,15 @@ Validate completed work with:
 
     python scripts/validate_stats.py
     python scripts/validate_experiment_outputs.py
+    python scripts/validate_week9_notebook.py
     pytest -q
+
+## Week 9 preliminary results
+
+Open `notebooks/week9_preliminary_results.ipynb` in Jupyter, VS Code, or another
+notebook viewer to present the checkpoint. It reads the fixed registered outputs
+and shows the main performance table, Sharpe-ratio significance tests, equity
+curves, and drawdowns.
 
 ## Reproducibility
 
