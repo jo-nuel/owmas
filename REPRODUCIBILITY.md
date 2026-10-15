@@ -14,17 +14,32 @@ The experiment uses the files below without downloading replacements:
 
 Create a Python 3.12 virtual environment and install the pinned packages in `requirements.txt`.
 
+Windows PowerShell:
+
 ```text
 python -m venv .venv
 .venv\Scripts\python -m pip install -r requirements.txt
 ```
 
-The commands use Windows paths because the project was developed on Windows 11. The Python scripts do not depend on Windows-only libraries.
+macOS or Linux:
+
+```text
+python3.12 -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt
+```
+
+The Python scripts do not depend on Windows-only libraries.
 
 ## Run the experiment
 
 ```text
 .venv\Scripts\python scripts\run_experiment.py
+```
+
+On macOS or Linux, use:
+
+```text
+.venv/bin/python scripts/run_experiment.py
 ```
 
 The registered analysis uses 10,000 bootstrap replications and may take several minutes. It writes the result tables, chart data, figures, summary, and metadata to `results/`.
@@ -36,8 +51,15 @@ The registered analysis uses 10,000 bootstrap replications and may take several 
 .venv\Scripts\python scripts\verify_data.py
 .venv\Scripts\python scripts\validate_stats.py
 .venv\Scripts\python scripts\validate_experiment_outputs.py
-.venv\Scripts\python scripts\validate_week9_notebook.py
-.venv\Scripts\python scripts\validate_week11_draft.py
+```
+
+On macOS or Linux, use:
+
+```text
+.venv/bin/python -m pytest -q
+.venv/bin/python scripts/verify_data.py
+.venv/bin/python scripts/validate_stats.py
+.venv/bin/python scripts/validate_experiment_outputs.py
 ```
 
 The data verification command prints its report without changing the repository. Use `--write-log` only when a dated verification needs to be added to `data/quality_log.txt`.
@@ -48,4 +70,13 @@ The checks confirm that the analysis ran as registered. They do not change the i
 
 ## Limits
 
-The study covers one US equity ETF at daily frequency. The 2016 to 2025 holdout is a temporal check within the frozen dataset, not an external replication. The sensitivity settings are supporting analyses rather than replacement primary models.
+The study covers one US equity ETF at daily frequency. The 2016 to 2025 late-sample subperiod is a temporal check within the frozen dataset, not an external replication. The sensitivity settings are supporting analyses rather than replacement primary models.
+
+## Coursework checks
+
+The Week 9 notebook and Week 11 draft checks are kept with the assessment evidence. They are not part of the research pipeline.
+
+```text
+python evidence/coursework/validate_week9_notebook.py
+python evidence/coursework/validate_week11_draft.py
+```

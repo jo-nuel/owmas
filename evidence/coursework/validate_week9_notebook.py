@@ -8,7 +8,7 @@ import warnings
 from pathlib import Path
 
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 NOTEBOOK = ROOT / "notebooks" / "week9_preliminary_results.ipynb"
 
 
