@@ -1,4 +1,4 @@
-"""Performance metrics — Methodology §3.8. YOU implement these.
+"""Performance metrics from Methodology section 3.8.
 
 All annualisation uses periods_per_year from config (252 for daily).
 Sharpe/Sortino use EXCESS returns over rf_daily.
@@ -71,7 +71,9 @@ def max_drawdown(returns: pd.Series) -> float:
     """Most negative peak-to-trough decline of the equity curve (<= 0)."""
     clean = _clean_returns(returns)
     equity = (1.0 + clean).cumprod()
-    drawdown = equity / equity.cummax() - 1.0
+    # Initial capital is a peak even when the first return is negative.
+    running_peak = equity.cummax().clip(lower=1.0)
+    drawdown = equity / running_peak - 1.0
     return float(drawdown.min())
 
 

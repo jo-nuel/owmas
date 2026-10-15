@@ -7,11 +7,10 @@ venv/
 .DS_Store
 
 # NOTE: data/ is deliberately NOT ignored.
-# The frozen SPY dataset and its quality log are research artifacts —
+# The frozen SPY dataset and its quality log are research artifacts.
 # the reproducibility claim in the methodology depends on versioning the
 # exact snapshot used. The files are small (a few hundred KB).
 
-# Generated outputs are reproducible from the frozen data by running the
-# pipeline, so they are not versioned:
-results/
+# The final results are versioned so reviewers can inspect the exact evidence
+# used in the thesis and compare it with a fresh run.
 *.pdf

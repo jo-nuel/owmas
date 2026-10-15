@@ -1,4 +1,4 @@
-"""Signal functions — Methodology §3.4. YOU implement these.
+"""Signal functions from Methodology section 3.4.
 
 Every function must be pure (no I/O, no globals) and operate on a
 pandas Series of prices indexed by date. The tests in
@@ -39,8 +39,7 @@ def ema(prices: pd.Series, m: int) -> pd.Series:
     """Exponential moving average, lambda = 2 / (m + 1).
 
     Recursive: EMA_t = lambda * p_t + (1 - lambda) * EMA_{t-1},
-    initialised with the SMA of the first m observations
-    (a standard, documented choice — state it in the thesis).
+    initialised with the SMA of the first m observations.
     """
     lam = 2 / (m + 1)
     result = pd.Series(np.nan, index=prices.index)
@@ -70,7 +69,7 @@ def orness(v: np.ndarray) -> float:
 
 
 def owmas(prices: pd.Series, m: int, beta: float, gamma: float) -> pd.Series:
-    """OWAWMA-based signal — §3.4.
+    """OWAWMA-based signal from Methodology section 3.4.
 
     Uses the separable form, Merigó & Yager (2019) Eq. (4):
         OWMAS = beta * OWMA + (1 - beta) * WMA

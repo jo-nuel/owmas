@@ -328,7 +328,8 @@ def _save_figures(returns: dict[str, pd.Series], rolling: pd.DataFrame) -> None:
               "EMA": "#999999", "BuyHold": "#b05a2b"}
     return_frame = pd.concat(returns, axis=1)[STRATEGIES]
     equity = (1.0 + return_frame).cumprod()
-    drawdown = equity.div(equity.cummax()).sub(1.0)
+    # Measure losses from the initial dollar as well as later peaks.
+    drawdown = equity.div(equity.cummax().clip(lower=1.0)).sub(1.0)
     equity.to_csv(RESULTS / "equity_curves.csv")
     drawdown.to_csv(RESULTS / "drawdowns.csv")
     rolling[STRATEGIES].to_csv(RESULTS / "rolling_sharpe.csv")
@@ -458,6 +459,16 @@ def main() -> None:
     _save_figures(returns, rolling)
     _write_summary(metrics, h1, h2, h3_summary, h3_tests, h4)
 
+    code_paths = [
+        "scripts/run_experiment.py",
+        "src/signals.py",
+        "src/backtest.py",
+        "src/metrics.py",
+        "src/stats.py",
+    ]
+    output_paths = [*tables, "equity_curves.csv", "drawdowns.csv",
+                    "rolling_sharpe.csv", "equity_curves.png", "drawdowns.png",
+                    "rolling_sharpe.png", "experiment_summary.md"]
     metadata = {
         "config_sha256": _sha256(ROOT / "config.yaml"),
         "spy_sha256": _sha256(ROOT / "data" / "spy.csv"),
@@ -468,6 +479,8 @@ def main() -> None:
         "bootstrap_reps": config["stats"]["bootstrap_reps"],
         "seed": config["stats"]["seed"],
         "confidence": config["stats"]["confidence"],
+        "code_sha256": {name: _sha256(ROOT / name) for name in code_paths},
+        "output_sha256": {name: _sha256(RESULTS / name) for name in output_paths},
     }
     (RESULTS / "run_metadata.json").write_text(
         json.dumps(metadata, indent=2) + "\n", encoding="utf-8"

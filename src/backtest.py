@@ -1,4 +1,4 @@
-"""Backtest engine — Methodology §3.5, §3.7. YOU implement these.
+"""Backtest engine from Methodology sections 3.5 and 3.7.
 
 Three explicitly separated stages (§3.7): signals -> positions -> returns.
 tests/test_backtest.py contains the look-ahead and known-answer tests.

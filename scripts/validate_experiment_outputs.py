@@ -1,14 +1,28 @@
 """Deterministic checks for generated full-experiment outputs."""
+import hashlib
 import json
 from pathlib import Path
+import sys
 
 import numpy as np
 import pandas as pd
 import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+
+from src.metrics import max_drawdown  # noqa: E402
+
 RESULTS = ROOT / "results"
 STRATEGIES = {"OWMAS", "SMA", "WMA", "EMA", "BuyHold"}
+
+
+def sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with open(path, "rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 
 def main() -> None:
@@ -22,6 +36,16 @@ def main() -> None:
     assert metadata["confidence"] == config["stats"]["confidence"]
     assert metadata["start"] == "2005-01-03"
     assert metadata["end"] == "2025-12-30"
+    assert metadata["config_sha256"] == sha256(ROOT / "config.yaml")
+    assert metadata["spy_sha256"] == sha256(ROOT / "data" / "spy.csv")
+    assert metadata["rf_sha256"] == sha256(ROOT / "data" / "rf.csv")
+    for name, expected in metadata["code_sha256"].items():
+        assert sha256(ROOT / name) == expected, name
+    for name, expected in metadata["output_sha256"].items():
+        assert sha256(RESULTS / name) == expected, name
+
+    # A first-day loss is measured from the starting capital of one dollar.
+    assert np.isclose(max_drawdown(pd.Series([-0.10, 0.20])), -0.10)
 
     metrics = pd.read_csv(RESULTS / "performance_metrics.csv", index_col="strategy")
     assert set(metrics.index) == STRATEGIES
