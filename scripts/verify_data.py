@@ -1,15 +1,14 @@
-"""Standalone cross-check: data/spy.csv (frozen) vs a manually downloaded
-second source, data/spy_stooq.csv (§3.3). Read-only — does not modify
-data/spy.csv, config.yaml, or tests/.
+"""Compare the frozen SPY data with the saved Stooq cross-check.
 
-Compares the `close` column only (not adj_close: dividend-adjustment
-conventions differ between providers and would produce false alarms).
+The default command is read-only. Pass ``--write-log`` only when intentionally
+recording a dated verification in ``data/quality_log.txt``.
 
 Run: python scripts/verify_data.py
 Exits non-zero for inadequate coverage or a systematic price discrepancy.
 Isolated provider errors are reported for review but do not invalidate an
 otherwise matching 20-year series.
 """
+import argparse
 from datetime import datetime, timezone
 from pathlib import Path
 import sys
@@ -32,7 +31,18 @@ def _load_close(path: Path) -> pd.Series:
     return df[close_col].astype(float).rename("close")
 
 
+def _arguments() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--write-log",
+        action="store_true",
+        help="append the verification report to data/quality_log.txt",
+    )
+    return parser.parse_args()
+
+
 def main() -> None:
+    args = _arguments()
     spy = _load_close(DATA / "spy.csv")
     stooq = _load_close(DATA / "spy_stooq.csv")
 
@@ -45,11 +55,11 @@ def main() -> None:
     coverage = n / total_rows
     outliers = reldiff > OUTLIER_RELDIFF
 
-    lines = [f"[{datetime.now(timezone.utc).isoformat()}] verify_data.py — spy.csv vs spy_stooq.csv (close, §3.3)"]
+    lines = [f"[{datetime.now(timezone.utc).isoformat()}] verify_data.py: spy.csv vs spy_stooq.csv (close, section 3.3)"]
     lines.append(f"overlap n={n} coverage={coverage:.2%} of {total_rows} frozen rows")
 
     if n == 0:
-        lines.append("no overlapping dates — cannot compare")
+        lines.append("no overlapping dates; cannot compare")
     else:
         lines.append(f"overlap range={joined.index[0].date()}..{joined.index[-1].date()}")
         lines.append(
@@ -71,8 +81,9 @@ def main() -> None:
     report = "\n".join(lines)
     print(report)
 
-    with open(DATA / "quality_log.txt", "a", encoding="utf-8") as f:
-        f.write("\n" + report + "\n")
+    if args.write_log:
+        with open(DATA / "quality_log.txt", "a", encoding="utf-8") as handle:
+            handle.write("\n" + report + "\n")
 
     failures = []
     if n == 0:

@@ -63,6 +63,8 @@ def main() -> None:
         ["OWMAS - SMA", "OWMAS - WMA", "OWMAS - EMA"]
     )]
     assert not (registered["p_value_two_sided"] < 0.05).any()
+    assert not (sharpe_tests["p_value_two_sided"] < 0.05).any()
+    assert "three registered moving-average comparisons" in full_text
 
     print("PASS: Week 9 notebook contains all required sections and every code cell executes")
 

@@ -1,60 +1,65 @@
-# OWMAS — Ordered Weighted Moving Average Signal
+# Ordered Weighted Moving Average Signal
 
-Honours Project, UTS 31482 — Jonathan Immanuel (14487692), Supervisor: Prof. Jose M. Merigo
+This repository contains the code and evidence for Jonathan Immanuel's UTS Honours research project, supervised by Professor Jose M. Merigo.
 
-Empirical evaluation of an OWAWMA-based trading signal (OWMAS) against SMA, WMA, EMA,
-and buy-and-hold on daily SPY data 2005–2025, per the pre-registered methodology in
-`My Writing/AT2 Introduction and Methods - REVISED.docx`.
+Repository: https://github.com/jo-nuel/owmas
 
-## Structure
+The study tests whether an Ordered Weighted Moving Average Signal (OWMAS) improves risk adjusted performance compared with SMA, WMA, EMA, and buy and hold. All active strategies use the same SPY data, 20 and 50 day crossover rule, next day execution, transaction costs, and cash return.
 
-- `config.yaml` — every pre-registered parameter (§3.4–3.7 of the methodology). Analysis
-  code must read parameters from here, never hard-code them.
-- `scripts/get_data.py` — downloads SPY + 3-month T-bill data, runs halting data
-  assertions, writes the frozen dataset to `data/`. Run once; never re-download silently.
-- `src/signals.py` — SMA, WMA, EMA, OWA weights, orness, and OWMAS.
-- `src/backtest.py` — crossover rule, t+1 positions, costs, cash yield, and equity.
-- `src/metrics.py` — CAGR, Sharpe, Sortino, max drawdown, volatility, and exposure.
-- `src/stats.py` — Ledoit-Wolf Sharpe test and stationary-bootstrap intervals.
-- `tests/` — the validation harness (§3.11). `pytest -q` runs everything.
-- `scripts/validate_stats.py` — deterministic validation against the published
-  Ledoit-Wolf mutual-fund example and the registered bootstrap seed.
+## Main result
 
-## Workflow (build order)
+The registered OWMAS did not produce a statistically significant Sharpe ratio improvement over the benchmarks. It reduced risk compared with buy and hold and showed useful downside control in some periods, but the results do not support a claim of consistent outperformance.
 
-1. `python scripts/get_data.py` — freeze the dataset.
-2. Implement `src/signals.py` until `pytest tests/test_signals.py` passes.
-3. Implement `src/backtest.py` + `src/metrics.py` until `pytest tests/test_backtest.py` passes.
-4. Run the signal-divergence audit (§3.7) — go/no-go checkpoint with supervisor.
-5. Implement `src/stats.py`, validate Ledoit–Wolf against a published example.
-6. `python scripts/run_experiment.py` — run the full registered experiment and
-   write tables, figures, metadata, and a generated summary to `results/`.
+| Strategy | CAGR | Sharpe | Volatility | Maximum drawdown |
+| --- | ---: | ---: | ---: | ---: |
+| OWMAS | 6.50% | 0.458 | 11.45% | -24.60% |
+| SMA | 5.66% | 0.383 | 11.71% | -28.36% |
+| WMA | 6.38% | 0.459 | 11.12% | -22.07% |
+| EMA | 8.53% | 0.627 | 11.37% | -25.35% |
+| Buy and hold | 10.69% | 0.539 | 19.05% | -55.19% |
 
-Validate completed work with:
+The complete tables, figures, and run metadata are in [`results/`](results/). These are the outputs used in the thesis and presentation.
 
-    python scripts/validate_stats.py
-    python scripts/validate_experiment_outputs.py
-    python scripts/validate_week9_notebook.py
-    python scripts/validate_week11_draft.py
-    pytest -q
+## Repository structure
 
-## Week 9 preliminary results
+- `config.yaml` contains the registered settings used by the experiment.
+- `data/` contains the frozen SPY and risk free datasets and the independent price cross-check.
+- `src/` contains the signal, backtest, metric, and statistical functions.
+- `scripts/` contains the experiment and validation commands.
+- `tests/` checks the signal definitions, execution timing, costs, and accounting rules.
+- `notebooks/` contains the Week 9 results notebook.
+- `evidence/` contains checkpoint records and the Results and Discussion draft.
+- `docs/decisions/` records the decision to retain the registered strategy after the divergence audit.
 
-Open `notebooks/week9_preliminary_results.ipynb` in Jupyter, VS Code, or another
-notebook viewer to present the checkpoint. It reads the fixed registered outputs
-and shows the main performance table, Sharpe-ratio significance tests, equity
-curves, and drawdowns.
+## Reproduce the results
 
-## Week 11 chapter draft
+Python 3.12 is recommended.
 
-The draft Results and Discussion chapters are in
-`evidence/week11/results_and_discussion_draft.md`. They cover all four
-hypotheses, the registered market subperiods, rolling Sharpe, sensitivity, and
-the 2016 to 2025 holdout.
+```text
+python -m venv .venv
+.venv\Scripts\python -m pip install -r requirements.txt
+.venv\Scripts\python scripts\run_experiment.py
+```
 
-## Reproducibility
+The experiment reads only the frozen datasets and `config.yaml`. It writes 17 files to `results/`. A repeated run with the registered seed produces the same files.
 
-Pinned environment (`requirements.txt`), fixed bootstrap seed (in `config.yaml`),
-git-tracked from first commit. Initialise with:
+Run the checks with:
 
-    git init && git add -A && git commit -m "scaffold"
+```text
+.venv\Scripts\python -m pytest -q
+.venv\Scripts\python scripts\verify_data.py
+.venv\Scripts\python scripts\validate_stats.py
+.venv\Scripts\python scripts\validate_experiment_outputs.py
+.venv\Scripts\python scripts\validate_week9_notebook.py
+.venv\Scripts\python scripts\validate_week11_draft.py
+```
+
+See [`REPRODUCIBILITY.md`](REPRODUCIBILITY.md) for the frozen inputs, output checks, and interpretation limits.
+
+## Research safeguards
+
+- The registered values in `config.yaml` are not changed after results are observed.
+- A signal calculated at the close of day `t` is first used on day `t+1`.
+- All strategy comparisons use paired dates and common trading assumptions.
+- The neutral OWMAS profile remains the primary result. Sensitivity results are not promoted after inspection.
+- The holdout period is part of the same frozen dataset and is not described as an independent replication.

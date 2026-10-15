@@ -2,7 +2,7 @@
 
 Run once:  python scripts/get_data.py
 Writes data/spy.csv and data/rf.csv plus data/quality_log.txt.
-Assertions HALT on failure — do not downgrade them to warnings.
+The checks stop the download when the data is not safe to use.
 """
 from pathlib import Path
 import sys
@@ -23,7 +23,7 @@ def main() -> None:
     log = []
 
     if (DATA / "spy.csv").exists():
-        sys.exit("data/spy.csv already exists — dataset is frozen. "
+        sys.exit("data/spy.csv already exists. The dataset is frozen. "
                  "Delete it deliberately (and record why) to re-download.")
 
     px = yf.download(c["ticker"], start=c["start"], end=c["end"],
@@ -32,7 +32,7 @@ def main() -> None:
     df.columns = ["open", "high", "low", "close", "adj_close", "volume"]
     df.index.name = "date"
 
-    # --- Halting assertions (§3.11) ---
+    # Stop before saving if the downloaded prices fail a basic check.
     assert df.index.is_monotonic_increasing, "dates not monotone"
     assert not df.index.duplicated().any(), "duplicate dates"
     assert df["adj_close"].notna().all(), "missing adjusted closes"
@@ -42,7 +42,7 @@ def main() -> None:
     log.append(f"rows={len(df)} range={df.index[0].date()}..{df.index[-1].date()}")
     log.append(f"max |daily return| = {r.abs().max():.4f} on {r.abs().idxmax().date()}")
 
-    # --- Cross-check against a second source on sampled dates (§3.3) ---
+    # Compare sampled prices with an independent source.
     try:
         alt = pdr.DataReader(f"{c['ticker']}.US", "stooq",
                              c["start"], c["end"]).sort_index()["Close"]
@@ -52,11 +52,10 @@ def main() -> None:
         reldiff = (joined["yahoo"] / joined["stooq"] - 1).abs()
         log.append(f"cross-check n={len(joined)} max reldiff={reldiff.max():.4%}")
         assert reldiff.max() < 0.01, "close prices disagree >1% with second source"
-    except Exception as e:  # cross-check is best-effort but its absence must be logged
+    except Exception as e:  # Record the fallback so the data source is clear.
         log.append(f"WARNING: stooq cross-check unavailable ({e}); "
                    "falling back to FRED SP500 index (returns-based, partial range)")
-        # SP500 is an index level (not an ETF price), so compare daily returns
-        # rather than price levels; FRED only retains ~10 years for this series.
+        # SP500 is an index, so compare daily returns rather than price levels.
         try:
             sp500 = pdr.DataReader("SP500", "fred", c["start"], c["end"]).iloc[:, 0].dropna()
             joined = pd.concat([df["close"].pct_change(), sp500.pct_change()],

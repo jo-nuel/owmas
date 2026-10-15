@@ -1,0 +1,13 @@
+cff-version: 1.2.0
+message: "Please cite this repository if you use the OWMAS code or results."
+title: "Ordered Weighted Moving Average Signal"
+type: software
+authors:
+  - family-names: "Immanuel"
+    given-names: "Jonathan"
+abstract: "Code and reproducible outputs for an Honours study of an Ordered Weighted Moving Average trading signal."
+keywords:
+  - ordered weighted averaging
+  - moving average
+  - quantitative finance
+  - reproducible research
