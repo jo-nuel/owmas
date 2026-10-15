@@ -354,12 +354,12 @@ def _save_figures(returns: dict[str, pd.Series], rolling: pd.DataFrame) -> None:
         plt.close(fig)
 
 
-def _sha256(path: Path) -> str:
-    digest = hashlib.sha256()
-    with open(path, "rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
+def _sha256(path: Path, *, text: bool = False) -> str:
+    payload = path.read_bytes()
+    if text:
+        # Git may use different line endings on different operating systems.
+        payload = payload.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+    return hashlib.sha256(payload).hexdigest()
 
 
 def _write_summary(metrics: pd.DataFrame, h1: pd.DataFrame, h2: pd.DataFrame,
@@ -470,7 +470,12 @@ def main() -> None:
                     "rolling_sharpe.csv", "equity_curves.png", "drawdowns.png",
                     "rolling_sharpe.png", "experiment_summary.md"]
     metadata = {
-        "config_sha256": _sha256(ROOT / "config.yaml"),
+        "hash_policy": {
+            "algorithm": "sha256",
+            "text_line_endings": "lf",
+            "binary_and_frozen_data": "raw",
+        },
+        "config_sha256": _sha256(ROOT / "config.yaml", text=True),
         "spy_sha256": _sha256(ROOT / "data" / "spy.csv"),
         "rf_sha256": _sha256(ROOT / "data" / "rf.csv"),
         "start": prices.index.min().date().isoformat(),
@@ -479,8 +484,13 @@ def main() -> None:
         "bootstrap_reps": config["stats"]["bootstrap_reps"],
         "seed": config["stats"]["seed"],
         "confidence": config["stats"]["confidence"],
-        "code_sha256": {name: _sha256(ROOT / name) for name in code_paths},
-        "output_sha256": {name: _sha256(RESULTS / name) for name in output_paths},
+        "code_sha256": {
+            name: _sha256(ROOT / name, text=True) for name in code_paths
+        },
+        "output_sha256": {
+            name: _sha256(RESULTS / name, text=not name.endswith(".png"))
+            for name in output_paths
+        },
     }
     (RESULTS / "run_metadata.json").write_text(
         json.dumps(metadata, indent=2) + "\n", encoding="utf-8"

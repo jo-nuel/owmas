@@ -17,12 +17,11 @@ RESULTS = ROOT / "results"
 STRATEGIES = {"OWMAS", "SMA", "WMA", "EMA", "BuyHold"}
 
 
-def sha256(path: Path) -> str:
-    digest = hashlib.sha256()
-    with open(path, "rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
+def sha256(path: Path, *, text: bool = False) -> str:
+    payload = path.read_bytes()
+    if text:
+        payload = payload.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+    return hashlib.sha256(payload).hexdigest()
 
 
 def main() -> None:
@@ -36,13 +35,19 @@ def main() -> None:
     assert metadata["confidence"] == config["stats"]["confidence"]
     assert metadata["start"] == "2005-01-03"
     assert metadata["end"] == "2025-12-30"
-    assert metadata["config_sha256"] == sha256(ROOT / "config.yaml")
+    assert metadata["hash_policy"] == {
+        "algorithm": "sha256",
+        "text_line_endings": "lf",
+        "binary_and_frozen_data": "raw",
+    }
+    assert metadata["config_sha256"] == sha256(ROOT / "config.yaml", text=True)
     assert metadata["spy_sha256"] == sha256(ROOT / "data" / "spy.csv")
     assert metadata["rf_sha256"] == sha256(ROOT / "data" / "rf.csv")
     for name, expected in metadata["code_sha256"].items():
-        assert sha256(ROOT / name) == expected, name
+        assert sha256(ROOT / name, text=True) == expected, name
     for name, expected in metadata["output_sha256"].items():
-        assert sha256(RESULTS / name) == expected, name
+        actual = sha256(RESULTS / name, text=not name.endswith(".png"))
+        assert actual == expected, name
 
     # A first-day loss is measured from the starting capital of one dollar.
     assert np.isclose(max_drawdown(pd.Series([-0.10, 0.20])), -0.10)

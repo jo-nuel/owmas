@@ -8,7 +8,7 @@ The experiment uses the files below without downloading replacements:
 - `data/rf.csv` contains the aligned daily risk free rate.
 - `config.yaml` contains the registered signal, cost, inference, and robustness settings.
 
-`results/run_metadata.json` records SHA-256 hashes for the inputs, analysis code, and generated outputs. `scripts/validate_experiment_outputs.py` checks these hashes.
+`results/run_metadata.json` records SHA-256 hashes for the inputs, analysis code, and generated outputs. Text files are hashed after normalizing line endings to LF, so verification gives the same result on Windows, macOS, and Linux. Frozen data and binary figures are hashed as raw bytes. `scripts/validate_experiment_outputs.py` checks the recorded policy and hashes.
 
 ## Environment
 

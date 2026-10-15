@@ -1,4 +1,9 @@
 {
+  "hash_policy": {
+    "algorithm": "sha256",
+    "text_line_endings": "lf",
+    "binary_and_frozen_data": "raw"
+  },
   "config_sha256": "66a257ba8f1211de59bd27bd3a9ee405c083ba353c504b7b4514d34a54d3a06d",
   "spy_sha256": "99e1db3be03bf9ea44b47b45bf4560b23571a9dca21f91c2245fcc78008ae930",
   "rf_sha256": "7be12d03b985e796636363525bc74d0b5a43477c16f20938c58d280e90c2c7b7",
@@ -9,28 +14,28 @@
   "seed": 14487692,
   "confidence": 0.95,
   "code_sha256": {
-    "scripts/run_experiment.py": "463e1adb27fc7a7e39315b0da72675358efe147a47fa96079e96513854b60b64",
+    "scripts/run_experiment.py": "a96c68d170e6d1a9da31300cad916867222f98458fe4b39b093cb62d18d2e882",
     "src/signals.py": "f91782fb16a4acfc997a3ea2de93edc3f08d05a72137cf3f3da9d68e6d8243ff",
     "src/backtest.py": "edbac906dbd7d09dc67fa86764dcac6a6ce93c0f90c1eba85108caf9ff7fc6a2",
     "src/metrics.py": "449a2e66d749ab62947d6cf6a5ed4c1d35b67904deffe94efe2bb768d1720aa3",
     "src/stats.py": "8a56ed4d4a86507d94e0de6b8bb32222af9b700de209fb259c58480cfe0e4601"
   },
   "output_sha256": {
-    "performance_metrics.csv": "516bc008903b859dae0d4949d1474b1b96976b94cba62acf031d981c70ddc56a",
-    "h1_sharpe_tests.csv": "1e57059aeb1630ff67e08b36fcf4ac476e1ee0af9da77259fb285031ee494103",
-    "h2_risk_tests.csv": "3a967eea0a35ee122da61ce108d8d8777a3406fe01bcc4f74dc4c5950d57df64",
-    "h3_rolling_summary.csv": "8e224886e10b986cb2bd5079920055cf5c67d8570f7050ae6a5d0381567b0887",
-    "h3_rolling_tests.csv": "ea7f1acd1934bd8cb41cc8b598e89d8096e2c39000bd6c386ee47b478781157b",
-    "h4_profile_tests.csv": "3bf2cdecd42ce04df2c2e6583a61b6062e061c01f12ca4941ec86b99fcb05e35",
-    "subperiod_metrics.csv": "725d705ef3d845d90ff437209e342478f2d3b150a62e1545d6beea7fe4205da0",
-    "holdout_metrics.csv": "8781b96744f29d3f2c2be347d657b644218851c442769d49a84baba0d196ed2d",
-    "sensitivity_metrics.csv": "6a38007518acc551f59a38b56245fc49c9747ad4bb8587ca4241a45ec37a15ca",
-    "equity_curves.csv": "dc7a97982dfaa75ade852a70d920cca84b14050ecde57f3a92fef65c2739dd9e",
-    "drawdowns.csv": "f04c99c38fc1d2d8442bc95a8e0ed92ff777294fd88a990c66db0e67179b843a",
-    "rolling_sharpe.csv": "f63bc53d218ef1e7ef440d7104bdb7fdeda23e770f92e8ae87f2074bb0fac19e",
+    "performance_metrics.csv": "9868cbc3538091bea16db03f1a654466c5cf14b1a2cd65e25a7f53439a92c43f",
+    "h1_sharpe_tests.csv": "692c50d804a437f49cb323c3809d8535301ac6f14e6252b96b2d574cc9c0164f",
+    "h2_risk_tests.csv": "fe6f524154a9c49e5eda367543ed3ecf8c40b4cdc97467e06dd8d84b994339d2",
+    "h3_rolling_summary.csv": "fc970b0643d1ddbde503a86230bad79559a5bca662e60b0b1a2e6a966263853e",
+    "h3_rolling_tests.csv": "33bff901d4539e241257b0f849c133d50b4ae4e6108564ec0e6e132d2596009d",
+    "h4_profile_tests.csv": "5c7fb5e21df49645ae5f343a0c0b1b938dbac7c2676572e6cafd7f90ae49c8b7",
+    "subperiod_metrics.csv": "aac3cc55eb7b02053e37bcd4661cb2d04cda5958646dfb47b6dd874354ebae6a",
+    "holdout_metrics.csv": "77a49ebedd7e04e484f6215aca96378c5b5c641a096fdca0eccc8e7c0cde0d7f",
+    "sensitivity_metrics.csv": "62accfcca5b148b818d4b2fb503f5ca7334e0ab839a37dcfffb167ba41124c7f",
+    "equity_curves.csv": "5d4049dc66e5543f94ff619378565cf76f0e812d1792a20e7dc58127ea59dfd8",
+    "drawdowns.csv": "cf214c63a646648dbd68fd3f77be70b38a9a885eb34d0bee77ac48acbb0cb878",
+    "rolling_sharpe.csv": "98ae00e403ad52228689bfbadb53d11eb3a60bedf43f57797bf01c08affc4c87",
     "equity_curves.png": "aa8c2bfa88da6ff54bb6dab8f943b66a76e0d63194bedfa0022b3eb7447f479f",
     "drawdowns.png": "b1c8d2d0a31e658a9c9b35287248e78eb5c6f136c1e98ff5774f1afcd30285d8",
     "rolling_sharpe.png": "5c12dc7eea04e467a28ec4c163489564c8335a16327068bd6bdc084b128f0907",
-    "experiment_summary.md": "9adbc9ed61c85232795b3cf032e1d2df11bb3b45a74fcc1d35e2f65ad07f00b0"
+    "experiment_summary.md": "7e0d3e26021b5fd4877ea00859c3ba9100819f5f7f6e61f21a7b58c173e23aec"
   }
 }
