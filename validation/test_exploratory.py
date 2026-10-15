@@ -5,6 +5,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+from src.signals import orness, owa_weights
+
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "results" / "exploratory"
 
@@ -44,6 +46,12 @@ def test_exploratory_label_and_outputs():
         "signal_disagreement_by_regime.csv",
         "signal_disagreement_by_year.csv",
         "signal_disagreement_by_year.png",
+        "owa_weight_profiles.csv",
+        "owa_weight_profiles.png",
+        "worked_example_prices.csv",
+        "worked_example_values.csv",
+        "worked_example_summary.csv",
+        "worked_example.png",
     ]
     for name in required:
         path = OUTPUT / name
@@ -51,3 +59,33 @@ def test_exploratory_label_and_outputs():
     metadata = json.loads((OUTPUT / "exploratory_metadata.json").read_text())
     assert metadata["analysis_type"] == "exploratory"
     assert metadata["registered_results_changed"] is False
+
+
+def test_weight_profiles_match_signal_definition():
+    profiles = pd.read_csv(OUTPUT / "owa_weight_profiles.csv")
+    gamma_by_profile = {"optimistic": 0.5, "neutral": 1.0, "conservative": 2.0}
+    for profile, gamma in gamma_by_profile.items():
+        rows = profiles[profiles["profile"] == profile].sort_values("rank")
+        expected = owa_weights(gamma, 20)
+        assert np.allclose(rows["weight"], expected)
+        assert np.isclose(rows["weight"].sum(), 1.0)
+        assert np.isclose(rows["orness"].iloc[0], orness(expected))
+
+
+def test_worked_examples_use_real_prices_and_show_neutral_identity():
+    summary = pd.read_csv(OUTPUT / "worked_example_summary.csv")
+    spy = pd.read_csv(ROOT / "data" / "spy.csv", index_col="date", parse_dates=True)
+    changes = spy["adj_close"].div(spy["adj_close"].shift(4)).sub(1.0).dropna()
+    expected = {
+        "strongest rise": changes.max(),
+        "strongest fall": changes.min(),
+    }
+    for label, change in expected.items():
+        rows = summary[summary["window"] == label]
+        assert np.allclose(rows["price_change"], change)
+        neutral = rows[rows["profile"] == "neutral"].iloc[0]
+        assert np.isclose(neutral["owma"], neutral["sma"])
+        assert np.isclose(
+            neutral["owmas_beta_0.5"],
+            0.5 * neutral["sma"] + 0.5 * neutral["wma"],
+        )

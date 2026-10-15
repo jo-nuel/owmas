@@ -21,6 +21,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from scripts.run_experiment import _build_strategies, _load_inputs  # noqa: E402
+from src.signals import orness, owa_weights  # noqa: E402
 
 OUTPUT = ROOT / "results" / "exploratory"
 
@@ -168,6 +169,162 @@ def _save_year_chart(by_year: pd.DataFrame) -> None:
     plt.close(fig)
 
 
+def _weight_profiles(profiles: dict[str, float], window: int) -> pd.DataFrame:
+    rows = []
+    for profile, gamma in profiles.items():
+        weights = owa_weights(float(gamma), window)
+        profile_orness = orness(weights)
+        for rank, weight in enumerate(weights, start=1):
+            rows.append({
+                "profile": profile,
+                "gamma": float(gamma),
+                "rank": rank,
+                "rank_meaning": "largest" if rank == 1 else (
+                    "smallest" if rank == window else "ordered value"
+                ),
+                "weight": float(weight),
+                "orness": profile_orness,
+            })
+    return pd.DataFrame(rows).set_index(["profile", "rank"])
+
+
+def _save_weight_chart(profiles: pd.DataFrame) -> None:
+    styles = {
+        "optimistic": ("#2F5597", "-"),
+        "neutral": ("#222222", "--"),
+        "conservative": ("#808080", ":"),
+    }
+    fig, ax = plt.subplots(figsize=(9, 5))
+    for profile, frame in profiles.reset_index().groupby("profile", sort=False):
+        color, line_style = styles[profile]
+        profile_orness = frame["orness"].iloc[0]
+        gamma = frame["gamma"].iloc[0]
+        ax.plot(
+            frame["rank"], frame["weight"] * 100,
+            color=color, linestyle=line_style, linewidth=2,
+            marker="o", markersize=3,
+            label=f"{profile.title()} (gamma={gamma:g}, orness={profile_orness:.3f})",
+        )
+    ax.set_xlabel("Rank after sorting prices from largest to smallest")
+    ax.set_ylabel("Weight (%)")
+    ax.set_xticks(range(1, 21))
+    ax.grid(axis="y", color="#D9D9D9", linewidth=0.7)
+    ax.set_axisbelow(True)
+    ax.legend(frameon=False)
+    fig.tight_layout()
+    fig.savefig(OUTPUT / "owa_weight_profiles.png", dpi=180)
+    plt.close(fig)
+
+
+def _worked_examples(prices: pd.Series, profiles: dict[str, float],
+                     beta: float) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    window = 5
+    changes = prices.div(prices.shift(window - 1)).sub(1.0).dropna()
+    selected = {
+        "strongest rise": changes.idxmax(),
+        "strongest fall": changes.idxmin(),
+    }
+    price_rows = []
+    value_rows = []
+    summary_rows = []
+    wma_weights = np.arange(1, window + 1) / sum(range(1, window + 1))
+
+    for label, end_date in selected.items():
+        end_location = prices.index.get_loc(end_date)
+        sample = prices.iloc[end_location - window + 1:end_location + 1]
+        sorted_prices = np.sort(sample.to_numpy())[::-1]
+        simple_average = float(sample.mean())
+        weighted_average = float(np.dot(sample.to_numpy(), wma_weights))
+        sample_change = float(sample.iloc[-1] / sample.iloc[0] - 1.0)
+        for observation, ((date, price), weight) in enumerate(
+            zip(sample.items(), wma_weights), start=1
+        ):
+            price_rows.append({
+                "window": label,
+                "observation": observation,
+                "date": date.date().isoformat(),
+                "price": float(price),
+                "wma_weight": float(weight),
+            })
+
+        for profile, gamma in profiles.items():
+            weights = owa_weights(float(gamma), window)
+            ordered_average = float(np.dot(sorted_prices, weights))
+            combined_signal = beta * ordered_average + (1.0 - beta) * weighted_average
+            summary_rows.append({
+                "window": label,
+                "start": sample.index[0].date().isoformat(),
+                "end": sample.index[-1].date().isoformat(),
+                "price_change": sample_change,
+                "profile": profile,
+                "gamma": float(gamma),
+                "orness": orness(weights),
+                "sma": simple_average,
+                "wma": weighted_average,
+                "owma": ordered_average,
+                "owmas_beta_0.5": combined_signal,
+            })
+            for rank, (price, weight) in enumerate(
+                zip(sorted_prices, weights), start=1
+            ):
+                value_rows.append({
+                    "window": label,
+                    "start": sample.index[0].date().isoformat(),
+                    "end": sample.index[-1].date().isoformat(),
+                    "profile": profile,
+                    "rank": rank,
+                    "sorted_price": float(price),
+                    "owa_weight": float(weight),
+                    "weighted_contribution": float(price * weight),
+                })
+
+    price_table = pd.DataFrame(price_rows).set_index(["window", "observation"])
+    values = pd.DataFrame(value_rows).set_index(["window", "profile", "rank"])
+    summary = pd.DataFrame(summary_rows).set_index(["window", "profile"])
+    return price_table, values, summary
+
+
+def _save_worked_example_chart(prices: pd.DataFrame, summary: pd.DataFrame) -> None:
+    display = summary.reset_index()
+    styles = {
+        "SMA": ("#222222", "--"),
+        "WMA": ("#808080", ":"),
+        "OWMAS optimistic": ("#2F5597", "-"),
+        "OWMAS neutral": ("#5B9BD5", "-."),
+        "OWMAS conservative": ("#17365D", (0, (5, 2))),
+    }
+    fig, axes = plt.subplots(1, 2, figsize=(11, 4.8), sharey=True)
+    for ax, label in zip(axes, ["strongest rise", "strongest fall"]):
+        frame = display[display["window"] == label]
+        x = np.arange(1, 6)
+        source = prices.loc[label].sort_index()
+        ax.plot(x, source["price"].to_numpy(), color="#222222", marker="o",
+                linewidth=1.8, label="SPY adjusted close")
+        fixed_lines = {"SMA": frame["sma"].iloc[0], "WMA": frame["wma"].iloc[0]}
+        for name, value in fixed_lines.items():
+            color, line_style = styles[name]
+            ax.axhline(value, color=color, linestyle=line_style, linewidth=1.4,
+                       label=name)
+        for _, row in frame.iterrows():
+            name = f"OWMAS {row['profile']}"
+            color, line_style = styles[name]
+            ax.axhline(row["owmas_beta_0.5"], color=color,
+                       linestyle=line_style, linewidth=1.4, label=name)
+        ax.set_title(
+            f"{label.title()}\n{frame['start'].iloc[0]} to {frame['end'].iloc[0]}"
+        )
+        ax.set_xlabel("Observation in five-price window")
+        ax.set_xticks(x)
+        ax.grid(axis="y", color="#D9D9D9", linewidth=0.7)
+        ax.set_axisbelow(True)
+    axes[0].set_ylabel("Adjusted close (USD)")
+    handles, labels = axes[0].get_legend_handles_labels()
+    fig.legend(handles, labels, frameon=False, loc="lower center", ncol=3)
+    fig.tight_layout(rect=(0, 0.13, 1, 1))
+    fig.savefig(OUTPUT / "worked_example.png", dpi=180)
+    plt.close(fig)
+
+
 def main() -> None:
     config, prices, rf_daily = _load_inputs()
     primary_gamma = config["owmas"]["gamma_profiles"][config["owmas"]["primary_profile"]]
@@ -192,13 +349,27 @@ def main() -> None:
     summary = _summary(disagreement, episodes, len(prices))
     by_regime = _by_regime(disagreement)
     by_year = _by_year(disagreement, prices.index)
+    weight_profiles = _weight_profiles(
+        config["owmas"]["gamma_profiles"], int(config["signal"]["short_window"])
+    )
+    worked_prices, worked_values, worked_summary = _worked_examples(
+        prices,
+        config["owmas"]["gamma_profiles"],
+        float(config["owmas"]["beta_primary"]),
+    )
 
     disagreement.to_csv(OUTPUT / "signal_disagreement_days.csv")
     episodes.to_csv(OUTPUT / "signal_disagreement_episodes.csv")
     summary.to_csv(OUTPUT / "signal_disagreement_summary.csv")
     by_regime.to_csv(OUTPUT / "signal_disagreement_by_regime.csv")
     by_year.to_csv(OUTPUT / "signal_disagreement_by_year.csv")
+    weight_profiles.to_csv(OUTPUT / "owa_weight_profiles.csv")
+    worked_prices.to_csv(OUTPUT / "worked_example_prices.csv")
+    worked_values.to_csv(OUTPUT / "worked_example_values.csv")
+    worked_summary.to_csv(OUTPUT / "worked_example_summary.csv")
     _save_year_chart(by_year)
+    _save_weight_chart(weight_profiles)
+    _save_worked_example_chart(worked_prices, worked_summary)
 
     metadata = {
         "analysis_type": "exploratory",

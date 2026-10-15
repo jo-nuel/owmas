@@ -11,3 +11,7 @@ python scripts/run_exploratory.py
 ```
 
 The daily file lists each disagreement date. The episode file groups consecutive disagreement dates when the same strategy remains invested. The regime and annual tables show where the differences occur. Returns in these files are descriptive and should not be read as new hypothesis tests.
+
+`owa_weight_profiles.csv` and its chart show how the three registered gamma profiles distribute weight across a 20-price window. Rank 1 is the largest price, not the most recent price.
+
+The worked example uses the strongest rising and falling five-price windows in the frozen SPY sample. This transparent selection makes the ordering mechanism easy to see. It is an illustration and not evidence of typical performance. The prices file records the original dates, prices, and recency weights. The values file shows every sorted price, OWA weight, and contribution. The summary compares OWMA and OWMAS with SMA and WMA.
