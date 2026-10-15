@@ -1,0 +1,10 @@
+,value
+observation_days,5282.0
+disagreement_days,260.0
+disagreement_fraction,0.04922377887163953
+owmas_invested_only_days,132.0
+sma_invested_only_days,128.0
+episodes,97.0
+median_episode_days,3.0
+owmas_compound_return_on_disagreement_days,0.05143806302752818
+sma_compound_return_on_disagreement_days,-0.02672587125559145

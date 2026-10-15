@@ -18,7 +18,7 @@ The registered OWMAS did not produce a statistically significant Sharpe ratio im
 | EMA | 8.53% | 0.627 | 11.37% | -25.35% |
 | Buy and hold | 10.69% | 0.539 | 19.05% | -55.19% |
 
-The complete tables, figures, and run metadata are in [`results/`](results/). These are the outputs used in the thesis and presentation.
+The complete registered tables, figures, and run metadata are in [`results/`](results/). These are the outputs used in the thesis and presentation. Post hoc descriptions of signal disagreement are kept separately in [`results/exploratory/`](results/exploratory/) and are not part of the registered hypothesis tests.
 
 ## Repository structure
 
@@ -60,6 +60,7 @@ Run the research checks on Windows PowerShell:
 .venv\Scripts\python scripts\verify_data.py
 .venv\Scripts\python scripts\validate_stats.py
 .venv\Scripts\python scripts\validate_experiment_outputs.py
+.venv\Scripts\python scripts\run_exploratory.py
 ```
 
 On macOS or Linux:
@@ -69,6 +70,7 @@ On macOS or Linux:
 .venv/bin/python scripts/verify_data.py
 .venv/bin/python scripts/validate_stats.py
 .venv/bin/python scripts/validate_experiment_outputs.py
+.venv/bin/python scripts/run_exploratory.py
 ```
 
 See [`REPRODUCIBILITY.md`](REPRODUCIBILITY.md) for the frozen inputs, output checks, and interpretation limits.

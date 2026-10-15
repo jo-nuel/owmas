@@ -1,0 +1,5 @@
+trend_regime,disagreement_type,days,share_of_disagreement_days
+falling,OWMAS invested only,3,0.011538461538461539
+falling,SMA invested only,119,0.4576923076923077
+rising,OWMAS invested only,129,0.49615384615384617
+rising,SMA invested only,9,0.03461538461538462

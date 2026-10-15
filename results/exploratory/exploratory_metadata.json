@@ -1,0 +1,9 @@
+{
+  "analysis_type": "exploratory",
+  "status": "post hoc descriptive analysis",
+  "registered_results_changed": false,
+  "config_sha256": "66a257ba8f1211de59bd27bd3a9ee405c083ba353c504b7b4514d34a54d3a06d",
+  "registered_run_metadata_sha256": "184b35c764b07c63f3c60b371605b0b10ee204b79dab7606413900f09c24a30c",
+  "regime_definition": "Trailing 20-trading-day adjusted-close return: positive is rising, negative is falling, zero is flat, and the warm-up period is unavailable.",
+  "interpretation_limit": "Returns on disagreement days and episodes are descriptive and do not support causal or confirmatory claims."
+}
