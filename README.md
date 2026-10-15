@@ -30,6 +30,7 @@ The complete tables, figures, and run metadata are in [`results/`](results/). Th
 - `notebooks/` contains the Week 9 results notebook.
 - `evidence/` contains checkpoint records and the Results and Discussion draft.
 - `docs/decisions/` records the decision to retain the registered strategy after the divergence audit.
+- `docs/CLAUDE.md` records the project working rules and disclosure requirement.
 
 ## Reproduce the results
 
