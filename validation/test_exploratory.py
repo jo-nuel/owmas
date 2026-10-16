@@ -52,6 +52,9 @@ def test_exploratory_label_and_outputs():
         "worked_example_values.csv",
         "worked_example_summary.csv",
         "worked_example.png",
+        "trend_conditional_mechanism_windows.csv",
+        "trend_conditional_mechanism_summary.csv",
+        "trend_conditional_mechanism.png",
     ]
     for name in required:
         path = OUTPUT / name
@@ -89,3 +92,28 @@ def test_worked_examples_use_real_prices_and_show_neutral_identity():
             neutral["owmas_beta_0.5"],
             0.5 * neutral["sma"] + 0.5 * neutral["wma"],
         )
+
+
+def test_trend_mechanism_reverses_effective_recency():
+    summary = pd.read_csv(OUTPUT / "trend_conditional_mechanism_summary.csv")
+    expected_sign = {
+        ("rising", "optimistic"): 1,
+        ("rising", "conservative"): -1,
+        ("falling", "optimistic"): -1,
+        ("falling", "conservative"): 1,
+    }
+    for window_length in [20, 50]:
+        frame = summary[summary["window_length"] == window_length]
+        for (regime, profile), sign in expected_sign.items():
+            row = frame[
+                (frame["trend_regime"] == regime)
+                & (frame["profile"] == profile)
+            ].iloc[0]
+            assert sign * row["mean_recency_shift"] > 0.0
+            assert row["fraction_matching_expected"] > 0.5
+
+
+def test_neutral_profile_has_no_recency_shift():
+    windows = pd.read_csv(OUTPUT / "trend_conditional_mechanism_windows.csv")
+    assert np.allclose(windows["neutral_recency_shift_from_neutral"], 0.0)
+    assert np.allclose(windows["neutral_owmas_relative_to_neutral"], 0.0)

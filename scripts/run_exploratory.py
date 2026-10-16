@@ -21,6 +21,12 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from scripts.run_experiment import _build_strategies, _load_inputs  # noqa: E402
+from scripts.exploratory_mechanism import (  # noqa: E402
+    mechanism_daily,
+    mechanism_summary,
+    mechanism_windows,
+    save_mechanism_chart,
+)
 from src.signals import orness, owa_weights  # noqa: E402
 
 OUTPUT = ROOT / "results" / "exploratory"
@@ -357,6 +363,14 @@ def main() -> None:
         config["owmas"]["gamma_profiles"],
         float(config["owmas"]["beta_primary"]),
     )
+    mechanism = mechanism_daily(
+        prices,
+        config["owmas"]["gamma_profiles"],
+        [int(config["signal"]["short_window"]), int(config["signal"]["long_window"])],
+        float(config["owmas"]["beta_primary"]),
+    )
+    mechanism_by_regime = mechanism_summary(mechanism)
+    mechanism_by_window = mechanism_windows(mechanism)
 
     disagreement.to_csv(OUTPUT / "signal_disagreement_days.csv")
     episodes.to_csv(OUTPUT / "signal_disagreement_episodes.csv")
@@ -367,9 +381,14 @@ def main() -> None:
     worked_prices.to_csv(OUTPUT / "worked_example_prices.csv")
     worked_values.to_csv(OUTPUT / "worked_example_values.csv")
     worked_summary.to_csv(OUTPUT / "worked_example_summary.csv")
+    mechanism_by_window.to_csv(OUTPUT / "trend_conditional_mechanism_windows.csv")
+    mechanism_by_regime.to_csv(OUTPUT / "trend_conditional_mechanism_summary.csv")
     _save_year_chart(by_year)
     _save_weight_chart(weight_profiles)
     _save_worked_example_chart(worked_prices, worked_summary)
+    save_mechanism_chart(
+        mechanism_by_regime, OUTPUT / "trend_conditional_mechanism.png"
+    )
 
     metadata = {
         "analysis_type": "exploratory",
@@ -382,6 +401,10 @@ def main() -> None:
         "regime_definition": (
             "Trailing 20-trading-day adjusted-close return: positive is rising, "
             "negative is falling, zero is flat, and the warm-up period is unavailable."
+        ),
+        "mechanism_regime_definition": (
+            "A registered price window is rising when its fitted linear price "
+            "slope is positive and falling when the slope is negative."
         ),
         "interpretation_limit": (
             "Returns on disagreement days and episodes are descriptive and do not "
