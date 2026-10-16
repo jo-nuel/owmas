@@ -28,7 +28,7 @@ The complete registered tables, figures, and run metadata are in [`results/`](re
 - `scripts/` contains the research pipeline and its validation commands.
 - `tests/` checks the signal definitions, execution timing, costs, and accounting rules.
 - `validation/` adds pytest coverage for statistics and performance metric edge cases.
-- `notebooks/` contains the Week 9 results notebook.
+- `notebooks/owmas_results_demo.ipynb` is a rendered demonstration of the main tables and figures. The Week 9 checkpoint notebook is retained alongside it as coursework evidence.
 - `evidence/` contains checkpoint records, coursework checks, and the Results and Discussion draft.
 - `docs/decisions/` records the decision to retain the registered strategy after the divergence audit.
 - `docs/CLAUDE.md` records the project working rules and disclosure requirement.
@@ -61,6 +61,7 @@ Run the research checks on Windows PowerShell:
 .venv\Scripts\python scripts\validate_stats.py
 .venv\Scripts\python scripts\validate_experiment_outputs.py
 .venv\Scripts\python scripts\run_exploratory.py
+.venv\Scripts\python scripts\build_demo_notebook.py
 ```
 
 On macOS or Linux:
@@ -71,6 +72,7 @@ On macOS or Linux:
 .venv/bin/python scripts/validate_stats.py
 .venv/bin/python scripts/validate_experiment_outputs.py
 .venv/bin/python scripts/run_exploratory.py
+.venv/bin/python scripts/build_demo_notebook.py
 ```
 
 See [`REPRODUCIBILITY.md`](REPRODUCIBILITY.md) for the frozen inputs, output checks, and interpretation limits.
