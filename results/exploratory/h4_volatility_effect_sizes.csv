@@ -1,0 +1,4 @@
+comparison,difference_percentage_points,ci_low_percentage_points,ci_high_percentage_points,p_value,block_size,ci_excludes_zero
+optimistic - neutral,-0.24817753005742,-0.3717095155461,-0.0831864701531,0.0037996200379962,169,True
+optimistic - conservative,-0.41199641128396997,-0.59115737479051,-0.19493136962735,0.0006999300069993,169,True
+neutral - conservative,-0.16381888122654,-0.25026300545991,-0.06498056849457,0.0010998900109989,169,True

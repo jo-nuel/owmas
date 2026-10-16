@@ -27,6 +27,15 @@ from scripts.exploratory_mechanism import (  # noqa: E402
     mechanism_windows,
     save_mechanism_chart,
 )
+from scripts.exploratory_context import (  # noqa: E402
+    exposure_context,
+    h1_effect_sizes,
+    h4_volatility_effect_sizes,
+    profile_return_correlations,
+    save_spy_sample_chart,
+    spy_statistics,
+    write_context_summary,
+)
 from src.signals import orness, owa_weights  # noqa: E402
 
 OUTPUT = ROOT / "results" / "exploratory"
@@ -371,6 +380,33 @@ def main() -> None:
     )
     mechanism_by_regime = mechanism_summary(mechanism)
     mechanism_by_window = mechanism_windows(mechanism)
+    h1_context = h1_effect_sizes(pd.read_csv(
+        ROOT / "results" / "h1_sharpe_tests.csv", index_col="comparison"
+    ))
+    h4_context = h4_volatility_effect_sizes(pd.read_csv(
+        ROOT / "results" / "h4_profile_tests.csv", index_col=["comparison", "metric"]
+    ))
+    exposure = exposure_context(pd.read_csv(
+        ROOT / "results" / "performance_metrics.csv", index_col="strategy"
+    ))
+    spy_context = spy_statistics(
+        prices,
+        config["robustness"]["subperiods"],
+        int(config["backtest"]["periods_per_year"]),
+    )
+    profile_returns = {}
+    for profile, gamma in config["owmas"]["gamma_profiles"].items():
+        _, profile_results = _build_strategies(
+            prices,
+            rf_daily,
+            short=config["signal"]["short_window"],
+            long=config["signal"]["long_window"],
+            beta=config["owmas"]["beta_primary"],
+            gamma=gamma,
+            cost=config["backtest"]["transaction_cost"],
+        )
+        profile_returns[profile] = profile_results["OWMAS"]
+    profile_correlations = profile_return_correlations(profile_returns)
 
     disagreement.to_csv(OUTPUT / "signal_disagreement_days.csv")
     episodes.to_csv(OUTPUT / "signal_disagreement_episodes.csv")
@@ -383,11 +419,27 @@ def main() -> None:
     worked_summary.to_csv(OUTPUT / "worked_example_summary.csv")
     mechanism_by_window.to_csv(OUTPUT / "trend_conditional_mechanism_windows.csv")
     mechanism_by_regime.to_csv(OUTPUT / "trend_conditional_mechanism_summary.csv")
+    h1_context.to_csv(OUTPUT / "h1_effect_size_context.csv")
+    h4_context.to_csv(OUTPUT / "h4_volatility_effect_sizes.csv")
+    exposure.to_csv(OUTPUT / "strategy_exposure_context.csv")
+    spy_context.to_csv(OUTPUT / "spy_descriptive_statistics.csv")
+    profile_correlations.to_csv(OUTPUT / "profile_return_correlations.csv")
     _save_year_chart(by_year)
     _save_weight_chart(weight_profiles)
     _save_worked_example_chart(worked_prices, worked_summary)
     save_mechanism_chart(
         mechanism_by_regime, OUTPUT / "trend_conditional_mechanism.png"
+    )
+    save_spy_sample_chart(
+        prices, config["robustness"]["subperiods"], OUTPUT / "spy_sample_periods.png"
+    )
+    write_context_summary(
+        h1_context,
+        h4_context,
+        exposure,
+        spy_context,
+        profile_correlations,
+        OUTPUT / "context_summary.md",
     )
 
     metadata = {

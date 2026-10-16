@@ -55,6 +55,13 @@ def test_exploratory_label_and_outputs():
         "trend_conditional_mechanism_windows.csv",
         "trend_conditional_mechanism_summary.csv",
         "trend_conditional_mechanism.png",
+        "h1_effect_size_context.csv",
+        "h4_volatility_effect_sizes.csv",
+        "strategy_exposure_context.csv",
+        "spy_descriptive_statistics.csv",
+        "profile_return_correlations.csv",
+        "spy_sample_periods.png",
+        "context_summary.md",
     ]
     for name in required:
         path = OUTPUT / name
@@ -117,3 +124,61 @@ def test_neutral_profile_has_no_recency_shift():
     windows = pd.read_csv(OUTPUT / "trend_conditional_mechanism_windows.csv")
     assert np.allclose(windows["neutral_recency_shift_from_neutral"], 0.0)
     assert np.allclose(windows["neutral_owmas_relative_to_neutral"], 0.0)
+
+
+def test_effect_size_context_matches_registered_results():
+    context = pd.read_csv(OUTPUT / "h1_effect_size_context.csv", index_col="benchmark")
+    registered = pd.read_csv(
+        ROOT / "results" / "h1_sharpe_tests.csv", index_col="comparison"
+    )
+    for benchmark, row in context.iterrows():
+        source = registered.loc[f"OWMAS - {benchmark}"]
+        assert np.isclose(row["difference"], source["difference"])
+        assert np.isclose(row["ci_low"], source["ci_low"])
+        assert np.isclose(row["ci_high"], source["ci_high"])
+        assert int(row["block_size"]) == int(source["block_size"])
+
+
+def test_exposure_context_matches_registered_metrics():
+    context = pd.read_csv(OUTPUT / "strategy_exposure_context.csv", index_col="strategy")
+    registered = pd.read_csv(
+        ROOT / "results" / "performance_metrics.csv", index_col="strategy"
+    )
+    assert np.allclose(context["exposure"], registered.loc[context.index, "exposure"])
+    assert np.allclose(context["sharpe"], registered.loc[context.index, "sharpe"])
+
+
+def test_h4_context_uses_annual_percentage_points():
+    context = pd.read_csv(
+        OUTPUT / "h4_volatility_effect_sizes.csv", index_col="comparison"
+    )
+    registered = pd.read_csv(ROOT / "results" / "h4_profile_tests.csv")
+    registered = registered[registered["metric"] == "volatility_difference"].set_index(
+        "comparison"
+    )
+    assert np.allclose(
+        context["difference_percentage_points"], registered["estimate"] * 100.0
+    )
+    assert np.allclose(context["ci_low_percentage_points"], registered["ci_low"] * 100.0)
+    assert np.allclose(context["ci_high_percentage_points"], registered["ci_high"] * 100.0)
+    assert context["ci_excludes_zero"].all()
+
+
+def test_profile_return_correlations_are_paired_and_high():
+    correlations = pd.read_csv(
+        OUTPUT / "profile_return_correlations.csv", index_col=0
+    )
+    assert np.allclose(correlations, correlations.T)
+    assert np.allclose(np.diag(correlations), 1.0)
+    off_diagonal = correlations.to_numpy()[np.triu_indices_from(correlations, k=1)]
+    assert (off_diagonal > 0.95).all()
+
+
+def test_spy_statistics_cover_full_sample_and_registered_subperiods():
+    statistics = pd.read_csv(OUTPUT / "spy_descriptive_statistics.csv", index_col="sample")
+    assert set(statistics.index) == {
+        "full_sample", "gfc", "post_gfc", "covid", "tightening"
+    }
+    assert int(statistics.loc["full_sample", "observations"]) == 5281
+    numeric = statistics.drop(columns=["start", "end"]).to_numpy(dtype=float)
+    assert np.isfinite(numeric).all()
