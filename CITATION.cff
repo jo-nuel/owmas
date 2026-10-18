@@ -1,6 +1,6 @@
 cff-version: 1.2.0
 message: "Please cite this repository if you use the OWMAS code or results."
-title: "Ordered Weighted Moving Average Signal"
+title: "Design and Evaluation of an Ordered Weighted Moving Average Signal for Risk-Aware Equity Trading Decision Making"
 type: software
 authors:
   - family-names: "Immanuel"

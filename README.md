@@ -1,6 +1,8 @@
-# Ordered Weighted Moving Average Signal
+# Design and Evaluation of an Ordered Weighted Moving Average Signal for Risk-Aware Equity Trading Decision Making
 
-This repository contains the code and evidence for Jonathan Immanuel's UTS Honours research project, supervised by Professor Jose M. Merigo.
+[![Tests](https://github.com/jo-nuel/owmas/actions/workflows/tests.yml/badge.svg)](https://github.com/jo-nuel/owmas/actions/workflows/tests.yml)
+
+This repository contains the code and evidence for Jonathan Immanuel's UTS Honours research project, supervised by Professor José M. Merigó.
 
 Repository: https://github.com/jo-nuel/owmas
 
@@ -61,6 +63,7 @@ Run the research checks on Windows PowerShell:
 .venv\Scripts\python scripts\validate_stats.py
 .venv\Scripts\python scripts\validate_experiment_outputs.py
 .venv\Scripts\python scripts\run_exploratory.py
+.venv\Scripts\python scripts\exploratory_monotonicity.py
 .venv\Scripts\python scripts\build_demo_notebook.py
 ```
 
@@ -72,12 +75,13 @@ On macOS or Linux:
 .venv/bin/python scripts/validate_stats.py
 .venv/bin/python scripts/validate_experiment_outputs.py
 .venv/bin/python scripts/run_exploratory.py
+.venv/bin/python scripts/exploratory_monotonicity.py
 .venv/bin/python scripts/build_demo_notebook.py
 ```
 
 See [`REPRODUCIBILITY.md`](REPRODUCIBILITY.md) for the frozen inputs, output checks, and interpretation limits.
 
-AI-assisted work followed the rules in [`docs/CLAUDE.md`](docs/CLAUDE.md) and is disclosed in the thesis AI Use Statement.
+I used OpenAI Codex and Anthropic Claude for coding support and debugging, documentation, thesis drafting, editing and formatting, and presentation drafting. I made the research decisions and checked the assisted work against the registered design, source code, 63-test suite, reference statistical result, complete experiment rerun, frozen outputs, cited papers, and supervisor feedback. The working rules are recorded in [`docs/CLAUDE.md`](docs/CLAUDE.md).
 
 ## Research safeguards
 

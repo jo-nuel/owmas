@@ -1,0 +1,5 @@
+window_length,measure,spearman_rho,p_value,n_windows
+20,profile_gap_fraction,-0.26639001123557476,3.348447463780083e-86,5263
+20,mean_linear_gap_fraction,0.7514341703488708,0.0,5263
+50,profile_gap_fraction,-0.3155555212916208,2.5118550458834695e-121,5233
+50,mean_linear_gap_fraction,0.8147100600152768,0.0,5233
