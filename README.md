@@ -51,7 +51,7 @@ python3.12 -m venv .venv
 .venv/bin/python scripts/run_experiment.py
 ```
 
-The experiment reads only the frozen datasets and `config.yaml`. It writes 17 files to `results/`. A repeated run with the registered seed produces the same files.
+The experiment reads only the frozen datasets and `config.yaml`. It writes 17 files to `results/`. A repeated run with the registered seed produces the same values. CSV files can contain machine-level rounding differences, and PNG file bytes can vary between systems even when the plotted data are unchanged.
 
 Run the research checks on Windows PowerShell:
 
@@ -76,6 +76,8 @@ On macOS or Linux:
 ```
 
 See [`REPRODUCIBILITY.md`](REPRODUCIBILITY.md) for the frozen inputs, output checks, and interpretation limits.
+
+AI-assisted work followed the rules in [`docs/CLAUDE.md`](docs/CLAUDE.md) and is disclosed in the thesis AI Use Statement.
 
 ## Research safeguards
 

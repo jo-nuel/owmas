@@ -44,6 +44,8 @@ On macOS or Linux, use:
 
 The registered analysis uses 10,000 bootstrap replications and may take several minutes. It writes the result tables, chart data, figures, summary, and metadata to `results/`.
 
+A repeated run should reproduce the same reported values. The paired Sharpe test table can differ at about machine precision, and PNG files can differ at the byte level because of rendering metadata. These differences do not change the tables, plotted data, or conclusions. `scripts/validate_experiment_outputs.py` checks the values with the stated tolerances.
+
 ## Run the checks
 
 ```text
