@@ -35,3 +35,5 @@ def test_analysis_reports_positive_gap_for_mixed_window():
     row = result.iloc[0]
     assert row["non_monotonicity"] > 0.0
     assert row["mean_linear_gap_fraction"] > 0.0
+    assert row["profile_gap_range_fraction"] > 0.0
+    assert row["profile_gap_std_fraction"] > 0.0

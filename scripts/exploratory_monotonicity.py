@@ -74,6 +74,8 @@ def analyse_windows(prices: pd.Series, windows: list[int], beta: float,
             if direction == "flat":
                 continue
             scale = float(values.mean())
+            window_range = float(np.ptp(values))
+            window_std = float(np.std(values, ddof=0))
             actual: dict[str, float] = {}
             reference_gaps: dict[str, float] = {}
             for name in ("optimistic", "conservative"):
@@ -82,13 +84,18 @@ def analyse_windows(prices: pd.Series, windows: list[int], beta: float,
                 )
                 actual[name] = value
                 reference_gaps[name] = abs(value - reference) / scale
+            profile_gap = abs(actual["optimistic"] - actual["conservative"])
             rows.append({
                 "date": sample.index[-1],
                 "window_length": window,
                 "direction": direction,
                 "non_monotonicity": non_monotonicity(values),
-                "profile_gap_fraction": (
-                    abs(actual["optimistic"] - actual["conservative"]) / scale
+                "profile_gap_fraction": profile_gap / scale,
+                "profile_gap_range_fraction": (
+                    profile_gap / window_range if window_range > 0.0 else 0.0
+                ),
+                "profile_gap_std_fraction": (
+                    profile_gap / window_std if window_std > 0.0 else 0.0
                 ),
                 "optimistic_linear_gap_fraction": reference_gaps["optimistic"],
                 "conservative_linear_gap_fraction": reference_gaps["conservative"],
@@ -113,6 +120,8 @@ def summarise(frame: pd.DataFrame) -> pd.DataFrame:
         n_windows=("date", "size"),
         mean_non_monotonicity=("non_monotonicity", "mean"),
         mean_profile_gap_fraction=("profile_gap_fraction", "mean"),
+        mean_profile_gap_range_fraction=("profile_gap_range_fraction", "mean"),
+        mean_profile_gap_std_fraction=("profile_gap_std_fraction", "mean"),
         mean_linear_gap_fraction=("mean_linear_gap_fraction", "mean"),
     )
 
@@ -122,7 +131,12 @@ def correlations(frame: pd.DataFrame) -> pd.DataFrame:
     rows = []
     data = frame.reset_index()
     for window, group in data.groupby("window_length"):
-        for measure in ["profile_gap_fraction", "mean_linear_gap_fraction"]:
+        for measure in [
+            "profile_gap_fraction",
+            "profile_gap_range_fraction",
+            "profile_gap_std_fraction",
+            "mean_linear_gap_fraction",
+        ]:
             result = spearmanr(group["non_monotonicity"], group[measure])
             rows.append({
                 "window_length": int(window),
