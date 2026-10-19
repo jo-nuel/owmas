@@ -81,7 +81,7 @@ On macOS or Linux:
 
 See [`REPRODUCIBILITY.md`](REPRODUCIBILITY.md) for the frozen inputs, output checks, and interpretation limits.
 
-I used OpenAI Codex and Anthropic Claude for coding support and debugging, documentation, thesis drafting, editing and formatting, and presentation drafting. I made the research decisions and checked the assisted work against the registered design, source code, 63-test suite, reference statistical result, complete experiment rerun, frozen outputs, cited papers, and supervisor feedback. The working rules are recorded in [`docs/CLAUDE.md`](docs/CLAUDE.md).
+I used OpenAI Codex and Anthropic Claude for coding support and debugging, documentation, thesis drafting, and formatting. I made the research decisions and checked the assisted work against the registered design, source code, 63-test suite, reference statistical result, complete experiment rerun, frozen outputs, cited papers, and supervisor feedback. The working rules are recorded in [`docs/CLAUDE.md`](docs/CLAUDE.md).
 
 ## Research safeguards
 
